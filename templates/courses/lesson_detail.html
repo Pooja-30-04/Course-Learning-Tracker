@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title|default:"Lesson Title" }} - CourseTracker{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8 animate-fade-in-down py-8">
+
+    <!-- Breadcrumb -->
+    <nav class="flex text-sm text-gray-500" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-2 w-full">
+            <li><a href="{% url 'courses:list' %}" class="hover:text-brand-600 transition-colors">Courses</a></li>
+            <li><span class="mx-2">/</span></li>
+            <li class="truncate"><a href="{% url 'courses:detail' course.pk %}"
+                    class="hover:text-brand-600 transition-colors font-medium text-gray-700">{{ course.title }}</a></li>
+            <li><span class="mx-2">/</span></li>
+            <li class="font-bold text-brand-600 truncate" aria-current="page">{{ lesson.title|default:"Lesson Title" }}</li>
+        </ol>
+    </nav>
+
+    <!-- Content Card -->
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-8 md:p-12 border-b border-gray-100 relative">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">{{ lesson.title|default:"Lesson Title" }}</h1>
+            {% if progress.completed %}
+            <span
+                class="absolute top-8 right-8 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border border-green-200">Completed
+                ✓</span>
+            {% endif %}
+        </div>
+
+        <div class="p-8 md:p-12 prose prose-lg prose-indigo max-w-none text-gray-700 leading-relaxed">
+            <!-- Simulated Lesson Content -->
+            <p>{{ lesson.content|linebreaks }}</p>
+        </div>
+
+        <div class="bg-gray-50 p-8 md:p-12 border-t border-gray-100 flex justify-between items-center">
+            <a href="{% url 'courses:detail' course.pk %}"
+                class="text-gray-500 hover:text-gray-800 font-medium transition-colors">← Back to Course</a>
+
+            {% if not progress.completed %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="mark_complete"
+                    class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all">
+                    Mark as Complete ✓
+                </button>
+            </form>
+            {% else %}
+            <button disabled
+                class="bg-gray-200 text-gray-500 px-8 py-3 rounded-xl font-bold cursor-not-allowed border border-gray-300">
+                Completed
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

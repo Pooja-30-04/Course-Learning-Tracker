@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - CourseTracker{% endblock %}
+
+{% block content %}
+<div class="space-y-8 animate-fade-in-down">
+    <!-- Header -->
+    <div
+        class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Welcome back, <span
+                    class="text-brand-600">{{ user.first_name|default:user.username }}</span>! 👋</h1>
+            <p class="text-sm text-gray-500 mt-1">Here is your learning summary. Keep up the good work!</p>
+        </div>
+        <div>
+            <a href="{% url 'courses:list' %}"
+                class="bg-brand-600 text-white px-6 py-3 rounded-full font-semibold shadow hover:bg-brand-700 transition-colors">Start
+                Learning</a>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-brand-50 hover-lift relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-16 h-16 bg-blue-500/10 rounded-bl-full"></div>
+            <span class="text-gray-500 text-sm font-semibold uppercase tracking-wider">Total Courses</span>
+            <div class="text-4xl font-extrabold text-gray-800 mt-2">{{ total_courses }}</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-brand-50 hover-lift relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-16 h-16 bg-green-500/10 rounded-bl-full"></div>
+            <span class="text-gray-500 text-sm font-semibold uppercase tracking-wider">Completed</span>
+            <div class="text-4xl font-extrabold text-green-600 mt-2">{{ completed_courses }}</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-brand-50 hover-lift relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-16 h-16 bg-yellow-500/10 rounded-bl-full"></div>
+            <span class="text-gray-500 text-sm font-semibold uppercase tracking-wider">In Progress</span>
+            <div class="text-4xl font-extrabold text-yellow-600 mt-2">{{ pending_courses }}</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-brand-50 hover-lift relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-16 h-16 bg-purple-500/10 rounded-bl-full"></div>
+            <span class="text-gray-500 text-sm font-semibold uppercase tracking-wider">Avg Quiz Score</span>
+            <div class="text-4xl font-extrabold text-purple-600 mt-2">{{ average_score }}%</div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800">Recent Quiz Results</h2>
+        </div>
+        <div class="p-0">
+            {% if recent_results %}
+            <ul class="divide-y divide-gray-100">
+                {% for result in recent_results %}
+                <li class="p-6 hover:bg-gray-50 transition-colors flex justify-between items-center">
+                    <div>
+                        <h4 class="font-semibold text-gray-800">{{ result.quiz.title }}</h4>
+                        <p class="text-sm text-gray-500 mt-1">Course: {{ result.quiz.course.title|default:"N/A" }}</p>
+                    </div>
+                    <div class="text-right">
+                        <span
+                            class="inline-block px-3 py-1 rounded-full text-sm font-bold {% if result.passed %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                            {{ result.score }}%
+                        </span>
+                        <p class="text-xs text-gray-500 mt-1">{{ result.timestamp|date:"M d, Y" }}</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="p-8 text-center text-gray-500">
+                <p>No quiz results yet. Take a quiz to test your knowledge!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

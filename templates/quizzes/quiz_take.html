@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz: {{ quiz.title }} - CourseTracker{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-8 animate-fade-in-down py-8">
+    <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ quiz.title }}</h1>
+            <p class="text-gray-500 mt-1">Passing score: {{ quiz.passing_score }}%</p>
+        </div>
+        <div class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl font-bold">
+            {{ questions.count }} Questions
+        </div>
+    </div>
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        {% for question in questions %}
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <h3 class="text-xl font-semibold text-gray-800 mb-6">{{ forloop.counter }}. {{ question.text }}</h3>
+
+            <div class="space-y-3">
+                <label
+                    class="flex items-center p-4 border rounded-xl hover:bg-gray-50 cursor-pointer transition-colors block">
+                    <input type="radio" name="{{ question.id }}" value="A" required
+                        class="w-5 h-5 text-brand-600 focus:ring-brand-500 border-gray-300 mr-4">
+                    <span class="text-gray-700">{{ question.option_a }}</span>
+                </label>
+
+                <label
+                    class="flex items-center p-4 border rounded-xl hover:bg-gray-50 cursor-pointer transition-colors block">
+                    <input type="radio" name="{{ question.id }}" value="B"
+                        class="w-5 h-5 text-brand-600 focus:ring-brand-500 border-gray-300 mr-4">
+                    <span class="text-gray-700">{{ question.option_b }}</span>
+                </label>
+
+                <label
+                    class="flex items-center p-4 border rounded-xl hover:bg-gray-50 cursor-pointer transition-colors block">
+                    <input type="radio" name="{{ question.id }}" value="C"
+                        class="w-5 h-5 text-brand-600 focus:ring-brand-500 border-gray-300 mr-4">
+                    <span class="text-gray-700">{{ question.option_c }}</span>
+                </label>
+
+                <label
+                    class="flex items-center p-4 border rounded-xl hover:bg-gray-50 cursor-pointer transition-colors block">
+                    <input type="radio" name="{{ question.id }}" value="D"
+                        class="w-5 h-5 text-brand-600 focus:ring-brand-500 border-gray-300 mr-4">
+                    <span class="text-gray-700">{{ question.option_d }}</span>
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="flex justify-end pt-4">
+            <button type="submit"
+                class="bg-gradient-to-r from-brand-600 to-indigo-700 text-white font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all text-lg">
+                Submit Quiz
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

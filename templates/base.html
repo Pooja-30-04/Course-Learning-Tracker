@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Learning Tracker{% endblock %}</title>
+    <!-- Tailwind CSS (Local compiled version) -->
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS for micro-animations and glassmorphism -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav
+        class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="/"
+                        class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-500 to-indigo-600 hover:scale-105 transition-transform duration-300">
+                        CourseTracker<span class="text-indigo-500">.</span>
+                    </a>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}"
+                        class="text-gray-600 hover:text-brand-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</a>
+                    <a href="{% url 'courses:list' %}"
+                        class="text-gray-600 hover:text-brand-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Courses</a>
+                    <a href="{% url 'analytics:dashboard' %}"
+                        class="text-gray-600 hover:text-brand-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Analytics</a>
+                    <div class="relative ml-3">
+                        <form method="post" action="{% url 'logout' %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-4 py-2 rounded-full text-sm font-semibold transition-all shadow-sm">Logout
+                                ({{ user.username }})</button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'login' %}"
+                        class="text-gray-600 hover:text-brand-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Sign
+                        In</a>
+                    <a href="{% url 'register' %}"
+                        class="bg-gradient-to-r from-brand-500 to-indigo-600 text-white px-5 py-2 rounded-full text-sm font-semibold shadow-md hover:shadow-lg hover:scale-105 transition-all">Get
+                        Started</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+            <div
+                class="p-4 rounded-lg shadow-sm border-l-4 animate-fade-in-down {% if message.tags == 'error' %}border-red-500 bg-red-50 text-red-700{% elif message.tags == 'success' %}border-green-500 bg-green-50 text-green-700{% else %}border-blue-500 bg-blue-50 text-blue-700{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock content %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500">&copy; {% now "Y" %} CourseTracker. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

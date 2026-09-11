@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Performance Analytics - CourseTracker{% endblock %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="space-y-8 animate-fade-in-down">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Performance Analytics</h1>
+            <p class="text-sm text-gray-500 mt-1">Dive deep into your learning patterns and quiz scores.</p>
+        </div>
+    </div>
+
+    <!-- Top Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div
+            class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 rounded-3xl shadow-lg relative overflow-hidden hover-lift">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-white/10 rounded-bl-full"></div>
+            <span class="text-indigo-100 text-sm font-semibold uppercase tracking-wider">Total Tests Taken</span>
+            <div class="text-4xl font-extrabold mt-2">{{ total_tests }}</div>
+        </div>
+
+        <div
+            class="bg-gradient-to-br from-green-400 to-emerald-600 text-white p-6 rounded-3xl shadow-lg relative overflow-hidden hover-lift">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-white/10 rounded-bl-full"></div>
+            <span class="text-green-100 text-sm font-semibold uppercase tracking-wider">Tests Passed</span>
+            <div class="text-4xl font-extrabold mt-2">{{ passed_tests }}</div>
+        </div>
+
+        <div
+            class="bg-gradient-to-br from-orange-400 to-red-500 text-white p-6 rounded-3xl shadow-lg relative overflow-hidden hover-lift">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-white/10 rounded-bl-full"></div>
+            <span class="text-orange-100 text-sm font-semibold uppercase tracking-wider">Overall Accuracy</span>
+            <div class="text-4xl font-extrabold mt-2">{{ overall_accuracy }}%</div>
+        </div>
+    </div>
+
+    <!-- Charts & Weak Areas -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Main Chart -->
+        <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Quiz Progress Overview</h2>
+            <div class="relative h-72 w-full">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Weak Areas -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="text-2xl mr-2">🎯</span> Weak Areas to Improve
+            </h2>
+
+            <div class="flex-grow">
+                {% if weak_results %}
+                <ul class="space-y-4">
+                    {% for result in weak_results %}
+                    <li
+                        class="bg-red-50 border border-red-100 p-4 rounded-2xl flex justify-between items-center transition-transform hover:scale-105">
+                        <div>
+                            <h4 class="font-bold text-red-800">{{ result.quiz.title }}</h4>
+                            <p class="text-xs text-red-600 mt-1">Course: {{ result.quiz.course.title }}</p>
+                        </div>
+                        <div
+                            class="bg-white px-3 py-1 rounded-full font-extrabold text-red-600 shadow-sm text-sm border-2 border-red-100">
+                            {{ result.score }}%
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="h-full flex flex-col items-center justify-center text-center p-6 text-gray-500">
+                    <div class="text-5xl mb-4">🌟</div>
+                    <p class="font-bold text-gray-700">You're doing great!</p>
+                    <p class="text-sm mt-1">No weak areas identified recently.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const labels = JSON.parse('{{ chart_labels|safe }}');
+        const dataPoints = JSON.parse('{{ chart_scores|safe }}');
+
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+
+        // Gradient for line
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(79, 70, 229, 0.5)'); // Indigo
+        gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Quiz Scores (%)',
+                    data: dataPoints,
+                    borderColor: '#4F46E5', // indigo-600
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#4F46E5',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                        padding: 12,
+                        titleFont: { size: 14, family: 'Inter' },
+                        bodyFont: { size: 14, family: 'Inter' },
+                        cornerRadius: 8,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: '#f3f4f6',
+                            drawBorder: false,
+                        },
+                        ticks: {
+                            font: { family: 'Inter' },
+                            color: '#6b7280'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false,
+                        },
+                        ticks: {
+                            font: { family: 'Inter' },
+                            color: '#6b7280',
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
